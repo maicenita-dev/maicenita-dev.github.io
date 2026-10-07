@@ -158,6 +158,19 @@ button.km:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
 .hint{font-size:17px;color:var(--blush);opacity:.8;margin-top:2px}
 @media(max-width:720px){.nm{text-align:center}}
 @media(prefers-reduced-motion:reduce){.km.pop{animation:none}}
+
+.annex[data-bot=art]{--ac:var(--hot);--ac2:var(--wine)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:14px}
+.gm{margin-top:10px;color:var(--blush)}
+.gi{padding:0;border:3px solid var(--bone);background:var(--black);box-shadow:4px 4px 0 var(--hot);cursor:pointer;display:block}
+.gi img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.gi:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--hot)}
+.gi:focus-visible,#lbx:focus-visible{outline:3px solid var(--blush);outline-offset:2px}
+.lb{position:fixed;inset:0;z-index:70;background:rgba(5,2,3,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px}
+.lb[hidden]{display:none}
+.lb img{max-width:100%;max-height:78vh;border:3px solid var(--bone);box-shadow:6px 6px 0 var(--hot);background:#fff}
+#lbx{position:absolute;top:12px;right:12px;width:40px;height:40px;font:24px VT323,monospace;color:var(--bone);background:var(--hot);border:3px solid var(--bone);cursor:pointer}
+#lbt{color:var(--blush);text-align:center}
 </style>
 </head>
 <body>
@@ -168,6 +181,7 @@ button.km:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
   <a href="#home" data-p="home">🏠 Home</a>
   <a href="#mora" data-p="mora">🍃 Mora</a>
   <a href="#emma" data-p="emma">🔮 Emma</a>
+  <a href="#art" data-p="art">🎨 Art</a>
   <div class="sep"></div>
   <a href="https://github.com/maicenita-dev">🐙 GitHub</a>
   <a href="https://t.me/maicenita">✈️ Telegram</a>
@@ -287,6 +301,17 @@ button.km:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
   <button style="--c:#d6428b" data-t="rose" aria-label="Rose theme"></button>
   <button style="--c:#4a63d9" data-t="ink" aria-label="Ink theme"></button>
 </nav>
+<section class="annex pg" id="p-art" data-bot="art" hidden>
+  <div class="win">
+    <div class="bar">art.gallery <i>_ □ x</i></div>
+    <div class="pn">
+      <p>My drawings. Tap one to see it bigger.</p>
+      <p id="gm" class="gm"></p>
+      <div class="gal" id="gal"></div>
+    </div>
+  </div>
+</section>
+<div class="lb" id="lb" hidden><button id="lbx" type="button" aria-label="Close">x</button><img id="lbi" alt=""><p id="lbt"></p></div>
 <script>
 const r=document.documentElement;
 try{const s=localStorage.getItem("theme");if(s)r.dataset.theme=s}catch(e){}
@@ -313,11 +338,27 @@ const U={mora:[["2026-10-06","Command guide is live","Every Mora command now has
 emma:[["Announced","Emma is coming","An entertainment chatbot you can talk to, only on AltAmino. Not programmed yet."]]};
 for(const k in U){const g=document.getElementById("u-"+k);U[k].forEach(([d,t,x])=>{const c=document.createElement("div");c.className="cd";const h=document.createElement("h3");h.textContent=d+" · "+t;const q=document.createElement("p");q.textContent=x;c.append(h,q);g.append(c)})}
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{const a=b.closest(".annex");a.querySelectorAll(".tabs button").forEach(x=>{const on=x===b;x.setAttribute("aria-selected",on);a.querySelector('.sp[data-s="'+x.dataset.s+'"]').hidden=!on})});
-const P=["home","mora","emma"],T={home:"Maicena",mora:"Mora",emma:"Emma"},dr=document.getElementById("dr"),ov=document.getElementById("ov"),hb=document.getElementById("ham");
+const lb=document.getElementById("lb"),lbi=document.getElementById("lbi"),lbt=document.getElementById("lbt"),lbx=document.getElementById("lbx");
+lbx.onclick=()=>{lb.hidden=true};lb.onclick=e=>{if(e.target===lb)lb.hidden=true};
+addEventListener("keydown",e=>{if(e.key==="Escape")lb.hidden=true});
+function loadArt(){
+ if(loadArt.d)return;loadArt.d=1;
+ const g=document.getElementById("gal"),m=document.getElementById("gm");
+ m.textContent="loading drawings...";
+ fetch("https://api.github.com/repos/maicenita-dev/maicenita-dev.github.io/contents/art").then(r=>{if(r.status===404)return[];if(!r.ok)throw 0;return r.json()}).then(a=>{
+  const f=a.filter(x=>x.type==="file"&&/\.(png|jpe?g|gif|webp)$/i.test(x.name)).sort((x,y)=>y.name.localeCompare(x.name));
+  if(!f.length){m.textContent="No drawings here yet. Coming soon ★";return}
+  m.remove();
+  f.forEach(x=>{const t=x.name.replace(/\.[^.]+$/,"").replace(/^\d{4}-\d{2}-\d{2}[_-]?/,"").replace(/[-_]+/g," ").trim()||"drawing";
+   const b=document.createElement("button");b.className="gi";b.type="button";b.setAttribute("aria-label","Open: "+t);
+   const i=new Image();i.loading="lazy";i.decoding="async";i.alt=t;i.src="art/"+encodeURIComponent(x.name);b.append(i);
+   b.onclick=()=>{lbi.src=i.src;lbi.alt=t;lbt.textContent=t;lb.hidden=false;lbx.focus()};g.append(b)});
+ }).catch(()=>{loadArt.d=0;m.textContent="Couldn't load the gallery right now. Try again in a bit."})}
+const P=["home","mora","emma","art"],T={home:"Maicena",mora:"Mora",emma:"Emma",art:"Art"},dr=document.getElementById("dr"),ov=document.getElementById("ov"),hb=document.getElementById("ham");
 function tog(o){dr.classList.toggle("on",o);ov.classList.toggle("on",o);hb.setAttribute("aria-expanded",o)}
 function show(h){if(!P.includes(h))h="home";P.forEach(p=>document.getElementById("p-"+p).hidden=p!==h);
 dr.querySelectorAll("a[data-p]").forEach(a=>a.dataset.p===h?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
-document.getElementById("tt").textContent=T[h];tog(false);scrollTo(0,0)}
+document.getElementById("tt").textContent=T[h];tog(false);scrollTo(0,0);if(h==="art")loadArt()}
 function go(){show(location.hash.slice(1))}
 hb.onclick=()=>{tog(true);dr.querySelector("a").focus()};ov.onclick=()=>tog(false);document.getElementById("x").onclick=()=>{tog(false);hb.focus()};
 dr.onclick=e=>{const a=e.target.closest("a");if(!a)return;tog(false);if(a.dataset.p){e.preventDefault();show(a.dataset.p);try{history.pushState(null,"","#"+a.dataset.p)}catch(x){}}};
