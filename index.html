@@ -351,9 +351,9 @@ function loadArt(){
   if(!f.length){m.textContent="No drawings here yet. Coming soon ★";return}
   m.remove();
   f.forEach(x=>{const t=x.name.replace(/\.[^.]+$/,"").replace(/^\d{4}-\d{2}-\d{2}[_-]?/,"").replace(/[-_]+/g," ").trim()||"drawing";
-   const b=document.createElement("button");b.className="gi";b.type="button";b.setAttribute("aria-label","Open: "+t);
-   const i=new Image();i.loading="lazy";i.decoding="async";i.alt=t;i.src="art/"+encodeURIComponent(x.name);b.append(i);
-   b.onclick=()=>{lbi.src=i.src;lbi.alt=t;lbt.textContent=t;lb.hidden=false;lbx.focus()};g.append(b)});
+   const b=document.createElement("button");b.className="gi";b.type="button";b.setAttribute("aria-label","Open drawing");
+   const i=new Image();i.loading="lazy";i.decoding="async";i.alt="Drawing";i.src="art/"+encodeURIComponent(x.name);b.append(i);
+   b.onclick=()=>{lbi.src=i.src;lbi.alt="Drawing";lbt.textContent="";lb.hidden=false;lbx.focus()};g.append(b)});
  }).catch(()=>{loadArt.d=0;m.textContent="Couldn't load the gallery right now. Try again in a bit."})}
 const P=["home","mora","emma","art"],T={home:"Maicena",mora:"Mora",emma:"Emma",art:"Art"},dr=document.getElementById("dr"),ov=document.getElementById("ov"),hb=document.getElementById("ham");
 function tog(o){dr.classList.toggle("on",o);ov.classList.toggle("on",o);hb.setAttribute("aria-expanded",o)}
